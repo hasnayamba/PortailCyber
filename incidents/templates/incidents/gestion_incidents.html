@@ -1,0 +1,40 @@
+{% extends 'incidents/base.html' %}
+
+{% block title %}Signaler un incident{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Gestion des signalements</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mb-3">Retour au tableau de bord</a>
+    {% if incidents %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Utilisateur</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for incident in incidents %}
+                <tr>
+                    <td>{{ incident.id }}</td>
+                    <td>{{ incident.get_type_incident_display }}</td>
+                    <td>{{ incident.user.username }}</td>
+                    <td>{{ incident.date_signalement|date:"d/m/Y H:i" }}</td>
+                    <td>{{ incident.get_statut_display }}</td>
+                    <td>
+                        <a href="{% url 'detail_incident' incident.id %}" class="btn btn-primary btn-sm">Voir / Modifier</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucun signalement trouvé.</p>
+    {% endif %}
+</div>
+{% endblock %}

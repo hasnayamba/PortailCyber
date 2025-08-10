@@ -1,0 +1,77 @@
+{% extends 'incidents/base.html' %}
+
+{% block title %}Signaler un incident{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>📋 Mes signalements</h2>
+    <div class="text-end mb-3">
+        <a href="{% url 'signaler_incident' %}" class="btn btn-success">➕ Nouveau signalement</a>
+    </div>
+
+    {% if incidents %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Preuves</th>
+                        <th>Dernier commentaire</th>
+                        <th>Analyse Deepfake</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for incident in incidents %}
+                    <tr>
+                        <td>{{ incident.id }}</td>
+                        <td>{{ incident.get_type_incident_display }}</td>
+                        <td>{{ incident.description|truncatechars:50 }}</td>
+                        <td>{{ incident.date_signalement|date:"d/m/Y H:i" }}</td>
+                        <td>{{ incident.get_statut_display }}</td>
+                        <td>
+                            {% if incident.preuve_image %}
+                                <a href="{{ incident.preuve_image.url }}" target="_blank">📷 Image</a><br/>
+                            {% endif %}
+                            {% if incident.preuve_video %}
+                                <a href="{{ incident.preuve_video.url }}" target="_blank">🎥 Vidéo</a><br/>
+                            {% endif %}
+                            {% if incident.preuve_log %}
+                                <a href="{{ incident.preuve_log.url }}" target="_blank">📄 Log</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                        {% with incident.commentaires_ordonnees.0 as dernier_commentaire %}
+                            {% if dernier_commentaire %}
+                            {{ dernier_commentaire.contenu|truncatechars:50 }}
+                            <br>
+                            <small class="text-muted">par {{ dernier_commentaire.user.username }}</small>
+                            {% else %}
+                            <span class="text-muted">Aucun commentaire</span>
+                            {% endif %}
+                        {% endwith %}
+                        </td>
+                        <td>
+                            {% if incident.deepfake_score %}
+                                {% if incident.deepfake_score > 0.7 %}
+                                    <span class="badge bg-danger">⚠ Suspect</span>
+                                {% else %}
+                                    <span class="badge bg-success">✅ Fiable</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">Non analysé</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="no-data">Aucun signalement enregistré.</p>
+    {% endif %}
+</div>
+{% endblock %}
